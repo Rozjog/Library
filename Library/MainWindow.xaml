@@ -5,29 +5,44 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Library"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1200" Width="1200">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="399*"/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
+        Title="Управление библиотекой" Height="700" Width="1000"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10" Grid.ColumnSpan="2">
+
+        <!-- ПАНЕЛЬ ФИЛЬТРАЦИИ (первая строка) -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+
             <TextBlock Text="Поиск:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-            <TextBox x:Name="SearchTextBox" Width="150" Margin="0,0,10,0"/>
+            <TextBox x:Name="SearchTextBox" Width="150" Margin="0,0,10,0" 
+         TextChanged="SearchTextBox_TextChanged"/>
+
             <TextBlock Text="Автор:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-            <ComboBox x:Name="AuthorFilterComboBox" Width="150" Margin="0,0,10,0"/>
-            <ComboBox x:Name="GenreFilterComboBox" Width="150" Margin="0,0,10,0"/>
-            <Button x:Name="AddBookButton" Content="Добавить книгу" Width="120" Margin="0,0,10,0"
-        Click="AddBookButton_Click"/>
+            <ComboBox x:Name="AuthorFilterComboBox" Width="150" Margin="0,0,10,0"
+                      DisplayMemberPath="LastName"/>
+
+            <TextBlock Text="Жанр:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+            <ComboBox x:Name="GenreFilterComboBox" Width="150" Margin="0,0,10,0"
+                      DisplayMemberPath="Name"/>
+
+            <Button x:Name="ApplyFilterButton" Content="Применить фильтр" Width="120" 
+                    Margin="0,0,10,0" Click="ApplyFilterButton_Click"/>
+
+            <Button x:Name="ClearFilterButton" Content="Сбросить" Width="80" 
+                    Click="ClearFilterButton_Click"/>
+
         </StackPanel>
+
+        <!-- ТАБЛИЦА КНИГ (вторая строка) -->
         <DataGrid x:Name="BooksDataGrid" Grid.Row="1" 
-          AutoGenerateColumns="False" IsReadOnly="True"
-          AlternatingRowBackground="LightGray" SelectionChanged="BooksDataGrid_SelectionChanged" Margin="-33,0,0,0" Grid.ColumnSpan="2">
+                  AutoGenerateColumns="False" IsReadOnly="True"
+                  AlternatingRowBackground="LightGray">
+
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
                 <DataGridTextColumn Header="Название" Binding="{Binding Title}" Width="200"/>
@@ -37,14 +52,31 @@
                 <DataGridTextColumn Header="Жанр" Binding="{Binding Genre.Name}" Width="120"/>
                 <DataGridTextColumn Header="В наличии" Binding="{Binding QuantityInStock}" Width="80"/>
             </DataGrid.Columns>
+
         </DataGrid>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Margin="340,10,0,0">
-            <Button x:Name="EditBookButton" Content="Редактировать" Width="120" Margin="0,0,10,0"/>
-            <Button x:Name="DeleteBookButton" Content="Удалить" Width="80" Margin="0,0,10,0"/>
-            <Button x:Name="ManageAuthorsButton" Content="Авторы" Width="80" Margin="0,0,10,0"/>
-            <Button x:Name="ManageGenresButton" Content="Жанры" Width="80"/>
+
+        <!-- НИЖНЯЯ ПАНЕЛЬ С КНОПКАМИ (третья строка) -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+
+            <Button x:Name="AddBookButton" Content="Добавить книгу" Width="120" Margin="0,0,10,0"
+                    Click="AddBookButton_Click"/>
+
+            <Button x:Name="EditBookButton" Content="Редактировать" Width="100" Margin="0,0,10,0"
+                    Click="EditBookButton_Click"/>
+
+            <Button x:Name="DeleteBookButton" Content="Удалить" Width="80" Margin="0,0,10,0"
+                    Click="DeleteBookButton_Click"/>
+
+            <Button x:Name="ManageAuthorsButton" Content="Авторы" Width="80" Margin="0,0,10,0"
+                    Click="ManageAuthorsButton_Click"/>
+
+            <Button x:Name="ManageGenresButton" Content="Жанры" Width="80" Margin="0,0,20,0"
+                    Click="ManageGenresButton_Click"/>
+
+            <TextBlock x:Name="TotalBooksText" Text="Всего книг: 0" 
+                       VerticalAlignment="Center" FontWeight="Bold"/>
+
         </StackPanel>
-        <TextBlock x:Name="TotalBooksText" Text="Всего книг: 0" 
-           VerticalAlignment="Center" Margin="20,0,0,0" FontWeight="Bold"/>
+
     </Grid>
 </Window>

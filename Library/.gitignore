@@ -1,0 +1,21 @@
+## Скомпилированные файлы
+bin/
+obj/
+
+## Файлы Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+
+## Базы данных (если не хотите заливать)
+*.db
+*.mdf
+*.ldf
+
+## Логи и временные файлы
+*.log
+*.tmp
+
+## Настройки пользователя
+appsettings.Development.json

@@ -87,40 +87,97 @@ namespace Library
         }
 
         // Нажатие на кнопку "Сохранить"
+        // Нажатие на кнопку "Сохранить"
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // Проверяем, что все поля заполнены
+                // === ВАЛИДАЦИЯ ===
+
+                // 1. Проверка названия
                 if (string.IsNullOrWhiteSpace(TitleTextBox.Text))
                 {
-                    MessageBox.Show("Введите название книги");
+                    MessageBox.Show("Введите название книги", "Ошибка",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    TitleTextBox.Focus();
                     return;
                 }
 
+                // 2. Проверка выбора автора
                 if (AuthorComboBox.SelectedItem == null)
                 {
-                    MessageBox.Show("Выберите автора");
+                    MessageBox.Show("Выберите автора", "Ошибка",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    AuthorComboBox.Focus();
                     return;
                 }
 
+                // 3. Проверка выбора жанра
                 if (GenreComboBox.SelectedItem == null)
                 {
-                    MessageBox.Show("Выберите жанр");
+                    MessageBox.Show("Выберите жанр", "Ошибка",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    GenreComboBox.Focus();
                     return;
                 }
 
+                // 4. Проверка года (число и диапазон)
                 if (string.IsNullOrWhiteSpace(YearTextBox.Text))
                 {
-                    MessageBox.Show("Введите год издания");
+                    MessageBox.Show("Введите год издания", "Ошибка",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    YearTextBox.Focus();
                     return;
                 }
+
+                if (!int.TryParse(YearTextBox.Text, out int year))
+                {
+                    MessageBox.Show("Год должен быть числом", "Ошибка",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    YearTextBox.SelectAll();
+                    YearTextBox.Focus();
+                    return;
+                }
+
+                if (year < 1400 || year > DateTime.Now.Year + 5)
+                {
+                    MessageBox.Show($"Год должен быть от 1400 до {DateTime.Now.Year + 5}", "Ошибка",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    YearTextBox.SelectAll();
+                    YearTextBox.Focus();
+                    return;
+                }
+
+                // 5. Проверка количества (число и неотрицательное)
+                int quantity = 0;
+                if (!string.IsNullOrWhiteSpace(QuantityTextBox.Text))
+                {
+                    if (!int.TryParse(QuantityTextBox.Text, out quantity))
+                    {
+                        MessageBox.Show("Количество должно быть числом", "Ошибка",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                        QuantityTextBox.SelectAll();
+                        QuantityTextBox.Focus();
+                        return;
+                    }
+
+                    if (quantity < 0)
+                    {
+                        MessageBox.Show("Количество не может быть отрицательным", "Ошибка",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                        QuantityTextBox.SelectAll();
+                        QuantityTextBox.Focus();
+                        return;
+                    }
+                }
+
+                // === ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ ===
 
                 // Заполняем книгу данными из полей
                 _currentBook.Title = TitleTextBox.Text.Trim();
-                _currentBook.PublishYear = int.Parse(YearTextBox.Text);
+                _currentBook.PublishYear = year;
                 _currentBook.ISBN = IsbnTextBox.Text?.Trim() ?? "";
-                _currentBook.QuantityInStock = string.IsNullOrWhiteSpace(QuantityTextBox.Text) ? 0 : int.Parse(QuantityTextBox.Text);
+                _currentBook.QuantityInStock = quantity;
 
                 // Получаем выбранного автора и жанр
                 var selectedAuthor = AuthorComboBox.SelectedItem as Author;
@@ -134,7 +191,6 @@ namespace Library
                 {
                     _context.Books.Add(_currentBook);
                 }
-                // Если это редактирование - просто сохраняем изменения
 
                 // Сохраняем изменения в базу
                 _context.SaveChanges();
@@ -145,7 +201,8 @@ namespace Library
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при сохранении: {ex.Message}");
+                MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

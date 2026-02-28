@@ -1,73 +1,82 @@
-﻿using System.Text;
+﻿using System;
+using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Microsoft.EntityFrameworkCore;
 using Library.Data;
 using Library.entity;
 
 namespace Library
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
-        private LibraryContext context;
+        private LibraryContext _context;
+
         public MainWindow()
         {
             InitializeComponent();
-            context = new LibraryContext();
-            context.Database.EnsureCreated();
+
+            _context = new LibraryContext();
+            _context.Database.EnsureCreated();
 
             LoadData();
             LoadFilters();
         }
 
+        // Загрузка книг в таблицу
         private void LoadData()
         {
-            var books = context.Books.Include(b => b.Author).Include(b => b.Genre).ToList();
+            var books = _context.Books
+                .Include(b => b.Author)
+                .Include(b => b.Genre)
+                .ToList();
 
             BooksDataGrid.ItemsSource = books;
-
             TotalBooksText.Text = $"Всего книг: {books.Count}";
         }
 
+        // Загрузка авторов и жанров в фильтры
         private void LoadFilters()
         {
-            var authors = context.Authors.ToList();
+            // Загружаем авторов
+            var authors = _context.Authors.ToList();
+            authors.Insert(0, new Author { Id = 0, LastName = "Все авторы" });
             AuthorFilterComboBox.ItemsSource = authors;
+            AuthorFilterComboBox.SelectedValuePath = "Id";
+            AuthorFilterComboBox.DisplayMemberPath = "LastName";
 
-            var genres = context.Genres.ToList();
+            // Загружаем жанры
+            var genres = _context.Genres.ToList();
+            genres.Insert(0, new Genre { Id = 0, Name = "Все жанры" });
             GenreFilterComboBox.ItemsSource = genres;
+            GenreFilterComboBox.SelectedValuePath = "Id";
+            GenreFilterComboBox.DisplayMemberPath = "Name";
         }
 
+        // Добавление книги
         private void AddBookButton_Click(object sender, RoutedEventArgs e)
         {
-            // Создаем окно добавления книги
-            var bookWindow = new BookWindow(context);
-
-            // Показываем окно и ждем, пока его закроют
-            bookWindow.Owner = this; // главное окно - владелец
+            var bookWindow = new BookWindow(_context);
+            bookWindow.Owner = this;
 
             if (bookWindow.ShowDialog() == true)
             {
-                // Если пользователь нажал "Сохранить" - перезагружаем список книг
                 LoadData();
+                LoadFilters();  // обновляем фильтры (мог появиться новый автор/жанр)
             }
         }
 
+        // Редактирование книги
         private void EditBookButton_Click(object sender, RoutedEventArgs e)
         {
             if (BooksDataGrid.SelectedItem is Book selectedBook)
             {
-                MessageBox.Show($"Редактирование книги: {selectedBook.Title}");
+                var bookWindow = new BookWindow(_context, selectedBook);
+                bookWindow.Owner = this;
+
+                if (bookWindow.ShowDialog() == true)
+                {
+                    LoadData();
+                }
             }
             else
             {
@@ -75,6 +84,7 @@ namespace Library
             }
         }
 
+        // Удаление книги
         private void DeleteBookButton_Click(object sender, RoutedEventArgs e)
         {
             if (BooksDataGrid.SelectedItem is Book selectedBook)
@@ -84,7 +94,19 @@ namespace Library
                                              MessageBoxButton.YesNo);
                 if (result == MessageBoxResult.Yes)
                 {
-                    MessageBox.Show("Удаление пока не реализовано");
+                    try
+                    {
+                        _context.Books.Remove(selectedBook);
+                        _context.SaveChanges();
+
+                        LoadData();
+
+                        MessageBox.Show("Книга удалена");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Ошибка при удалении: {ex.Message}");
+                    }
                 }
             }
             else
@@ -93,31 +115,83 @@ namespace Library
             }
         }
 
+        // Управление авторами
         private void ManageAuthorsButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Здесь будет окно управления авторами");
+            var authorsWindow = new AuthorsWindow(_context);
+            authorsWindow.Owner = this;
+            authorsWindow.ShowDialog();
+
+            // После закрытия окна авторов перезагружаем данные
+            LoadData();
+            LoadFilters();
         }
 
+        // Управление жанрами (пока заглушка)
         private void ManageGenresButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Здесь будет окно управления жанрами");
+            var genresWindow = new GenresWindow(_context);
+            genresWindow.Owner = this;
+            genresWindow.ShowDialog();
+
+            // После закрытия окна жанров перезагружаем данные
+            LoadData();
+            LoadFilters();  // обновляем список жанров в фильтре
         }
 
+        private void SearchTextBox_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            // Применяем фильтры при каждом изменении текста
+            ApplyFilters();
+        }
+
+        // Применение фильтров (пока заглушка)
         private void ApplyFilterButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Здесь будет фильтрация");
+            ApplyFilters();
+        }
+
+        private void ApplyFilters()
+        {
+            var query = _context.Books
+                .Include(b => b.Author)
+                .Include(b => b.Genre)
+                .AsQueryable();
+
+            // Поиск по названию
+            if (!string.IsNullOrWhiteSpace(SearchTextBox.Text))
+            {
+                string searchText = SearchTextBox.Text.ToLower();
+                query = query.Where(b => b.Title.ToLower().Contains(searchText));
+            }
+
+            // Фильтр по автору (если выбран не "Все авторы")
+            if (AuthorFilterComboBox.SelectedItem is Author selectedAuthor && selectedAuthor.Id > 0)
+            {
+                query = query.Where(b => b.AuthorId == selectedAuthor.Id);
+            }
+
+            // Фильтр по жанру (если выбран не "Все жанры")
+            if (GenreFilterComboBox.SelectedItem is Genre selectedGenre && selectedGenre.Id > 0)
+            {
+                query = query.Where(b => b.GenreId == selectedGenre.Id);
+            }
+
+            var filteredBooks = query.ToList();
+            BooksDataGrid.ItemsSource = filteredBooks;
+            TotalBooksText.Text = $"Всего книг: {filteredBooks.Count}";
         }
 
         private void ClearFilterButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Здесь будет сброс фильтров");
+            SearchTextBox.Text = "";
+
+            // Сбрасываем на "Все авторы" и "Все жанры"
+            AuthorFilterComboBox.SelectedIndex = 0;
+            GenreFilterComboBox.SelectedIndex = 0;
+
+            // Применяем фильтры (покажет все книги)
+            ApplyFilters();
         }
-
-        private void BooksDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
-
     }
 }
