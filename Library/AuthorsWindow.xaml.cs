@@ -17,20 +17,18 @@ namespace Library
 
             _context = context;
 
-            // Загружаем авторов вместе с их книгами (чтобы показать количество)
             LoadAuthors();
         }
 
         private void LoadAuthors()
         {
             var authors = _context.Authors
-                .Include(a => a.Books)  // загружаем книги, чтобы посчитать количество
+                .Include(a => a.Books) 
                 .ToList();
 
             AuthorsDataGrid.ItemsSource = authors;
         }
 
-        // Добавить автора
         private void AddAuthorButton_Click(object sender, RoutedEventArgs e)
         {
             var authorWindow = new AuthorWindow(_context);
@@ -38,11 +36,10 @@ namespace Library
 
             if (authorWindow.ShowDialog() == true)
             {
-                LoadAuthors();  // перезагружаем список
+                LoadAuthors();
             }
         }
 
-        // Редактировать автора
         private void EditAuthorButton_Click(object sender, RoutedEventArgs e)
         {
             if (AuthorsDataGrid.SelectedItem is Author selectedAuthor)
@@ -52,7 +49,7 @@ namespace Library
 
                 if (authorWindow.ShowDialog() == true)
                 {
-                    LoadAuthors();  // перезагружаем
+                    LoadAuthors();
                 }
             }
             else
@@ -61,12 +58,10 @@ namespace Library
             }
         }
 
-        // Удалить автора
         private void DeleteAuthorButton_Click(object sender, RoutedEventArgs e)
         {
             if (AuthorsDataGrid.SelectedItem is Author selectedAuthor)
             {
-                // Проверяем, есть ли у автора книги
                 if (selectedAuthor.Books != null && selectedAuthor.Books.Any())
                 {
                     MessageBox.Show("Нельзя удалить автора, у которого есть книги. Сначала удалите все его книги.");
@@ -83,7 +78,7 @@ namespace Library
                     {
                         _context.Authors.Remove(selectedAuthor);
                         _context.SaveChanges();
-                        LoadAuthors();  // перезагружаем
+                        LoadAuthors(); 
                     }
                     catch (Exception ex)
                     {
@@ -97,7 +92,6 @@ namespace Library
             }
         }
 
-        // Закрыть окно
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();

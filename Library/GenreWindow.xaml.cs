@@ -10,8 +10,6 @@ namespace Library
         private LibraryContext _context;
         private Genre _currentGenre;
         private bool _isEditMode;
-
-        // Конструктор для ДОБАВЛЕНИЯ
         internal GenreWindow(LibraryContext context)
         {
             InitializeComponent();
@@ -22,8 +20,6 @@ namespace Library
 
             this.Title = "Добавление жанра";
         }
-
-        // Конструктор для РЕДАКТИРОВАНИЯ
         internal GenreWindow(LibraryContext context, Genre genreToEdit)
         {
             InitializeComponent();
@@ -33,19 +29,14 @@ namespace Library
             _isEditMode = true;
 
             this.Title = "Редактирование жанра";
-
-            // Заполняем поля
             NameTextBox.Text = _currentGenre.Name;
             DescriptionTextBox.Text = _currentGenre.Description;
         }
 
-        // Сохранение
-        // Сохранение
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // Проверки
                 if (string.IsNullOrWhiteSpace(NameTextBox.Text))
                 {
                     MessageBox.Show("Введите название жанра", "Ошибка",
@@ -62,17 +53,13 @@ namespace Library
                     return;
                 }
 
-                // Заполняем жанр
                 _currentGenre.Name = NameTextBox.Text.Trim();
                 _currentGenre.Description = DescriptionTextBox.Text?.Trim() ?? "";
-
-                // Добавляем если новый
                 if (!_isEditMode)
                 {
                     _context.Genres.Add(_currentGenre);
                 }
 
-                // Сохраняем
                 _context.SaveChanges();
 
                 this.DialogResult = true;
@@ -85,7 +72,6 @@ namespace Library
             }
         }
 
-        // Отмена
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             this.DialogResult = false;

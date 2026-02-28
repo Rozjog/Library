@@ -24,13 +24,11 @@
         <TextBox x:Name="NameTextBox" Grid.Row="0" Grid.Column="1" 
                  Height="30" Margin="0,0,0,15"/>
 
-        <!-- Описание -->
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Описание:" 
                    VerticalAlignment="Top" Margin="0,0,10,15"/>
         <TextBox x:Name="DescriptionTextBox" Grid.Row="1" Grid.Column="1" 
                  Height="80" Margin="0,0,0,15" TextWrapping="Wrap" AcceptsReturn="True"/>
 
-        <!-- Кнопки -->
         <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" 
                     Orientation="Horizontal" HorizontalAlignment="Right" 
                     VerticalAlignment="Bottom">

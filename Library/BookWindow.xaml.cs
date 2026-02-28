@@ -9,16 +9,9 @@ namespace Library
 {
     public partial class BookWindow : Window
     {
-        // Ссылка на контекст базы данных
         private LibraryContext _context;
-
-        // Книга, которую мы добавляем или редактируем
         private Book _currentBook;
-
-        // Флаг: true - редактирование, false - добавление
         private bool _isEditMode;
-
-        // Конструктор для режима ДОБАВЛЕНИЯ
         internal BookWindow(LibraryContext context)
         {
             InitializeComponent();
@@ -27,14 +20,11 @@ namespace Library
             _currentBook = new Book();
             _isEditMode = false;
 
-            // Меняем заголовок окна
             this.Title = "Добавление книги";
 
-            // Загружаем списки авторов и жанров
             LoadComboBoxes();
         }
 
-        // Конструктор для режима РЕДАКТИРОВАНИЯ
         internal BookWindow(LibraryContext context, Book bookToEdit)
         {
             InitializeComponent();
@@ -43,29 +33,22 @@ namespace Library
             _currentBook = bookToEdit;
             _isEditMode = true;
 
-            // Меняем заголовок окна
             this.Title = "Редактирование книги";
 
-            // Загружаем списки авторов и жанров
             LoadComboBoxes();
 
-            // Заполняем поля данными из редактируемой книги
             LoadBookData();
         }
 
-        // Загрузка списков авторов и жанров
         private void LoadComboBoxes()
         {
-            // Загружаем всех авторов из базы
             var authors = _context.Authors.ToList();
             AuthorComboBox.ItemsSource = authors;
 
-            // Загружаем все жанры из базы
             var genres = _context.Genres.ToList();
             GenreComboBox.ItemsSource = genres;
         }
 
-        // Заполнение полей данными книги (для режима редактирования)
         private void LoadBookData()
         {
             TitleTextBox.Text = _currentBook.Title;
@@ -73,28 +56,20 @@ namespace Library
             IsbnTextBox.Text = _currentBook.ISBN;
             QuantityTextBox.Text = _currentBook.QuantityInStock.ToString();
 
-            // Выбираем нужного автора в списке
             if (_currentBook.AuthorId > 0)
             {
                 AuthorComboBox.SelectedValue = _currentBook.AuthorId;
             }
-
-            // Выбираем нужный жанр в списке
             if (_currentBook.GenreId > 0)
             {
                 GenreComboBox.SelectedValue = _currentBook.GenreId;
             }
         }
-
-        // Нажатие на кнопку "Сохранить"
-        // Нажатие на кнопку "Сохранить"
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // === ВАЛИДАЦИЯ ===
 
-                // 1. Проверка названия
                 if (string.IsNullOrWhiteSpace(TitleTextBox.Text))
                 {
                     MessageBox.Show("Введите название книги", "Ошибка",
@@ -103,7 +78,6 @@ namespace Library
                     return;
                 }
 
-                // 2. Проверка выбора автора
                 if (AuthorComboBox.SelectedItem == null)
                 {
                     MessageBox.Show("Выберите автора", "Ошибка",
@@ -112,7 +86,6 @@ namespace Library
                     return;
                 }
 
-                // 3. Проверка выбора жанра
                 if (GenreComboBox.SelectedItem == null)
                 {
                     MessageBox.Show("Выберите жанр", "Ошибка",
@@ -121,7 +94,6 @@ namespace Library
                     return;
                 }
 
-                // 4. Проверка года (число и диапазон)
                 if (string.IsNullOrWhiteSpace(YearTextBox.Text))
                 {
                     MessageBox.Show("Введите год издания", "Ошибка",
@@ -148,7 +120,6 @@ namespace Library
                     return;
                 }
 
-                // 5. Проверка количества (число и неотрицательное)
                 int quantity = 0;
                 if (!string.IsNullOrWhiteSpace(QuantityTextBox.Text))
                 {
@@ -171,31 +142,24 @@ namespace Library
                     }
                 }
 
-                // === ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ ===
-
-                // Заполняем книгу данными из полей
                 _currentBook.Title = TitleTextBox.Text.Trim();
                 _currentBook.PublishYear = year;
                 _currentBook.ISBN = IsbnTextBox.Text?.Trim() ?? "";
                 _currentBook.QuantityInStock = quantity;
 
-                // Получаем выбранного автора и жанр
                 var selectedAuthor = AuthorComboBox.SelectedItem as Author;
                 var selectedGenre = GenreComboBox.SelectedItem as Genre;
 
                 _currentBook.AuthorId = selectedAuthor.Id;
                 _currentBook.GenreId = selectedGenre.Id;
 
-                // Если это добавление новой книги
                 if (!_isEditMode)
                 {
                     _context.Books.Add(_currentBook);
                 }
 
-                // Сохраняем изменения в базу
                 _context.SaveChanges();
 
-                // Закрываем окно с результатом "успешно"
                 this.DialogResult = true;
                 this.Close();
             }
@@ -206,10 +170,8 @@ namespace Library
             }
         }
 
-        // Нажатие на кнопку "Отмена"
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            // Закрываем окно с результатом "отмена"
             this.DialogResult = false;
             this.Close();
         }

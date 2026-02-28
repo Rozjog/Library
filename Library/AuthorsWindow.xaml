@@ -12,11 +12,9 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Заголовок -->
         <TextBlock Grid.Row="0" Text="Список авторов" FontSize="16" FontWeight="Bold" 
                    Margin="0,0,0,10" HorizontalAlignment="Center"/>
 
-        <!-- Таблица с авторами -->
         <DataGrid x:Name="AuthorsDataGrid" Grid.Row="1" 
                   AutoGenerateColumns="False" IsReadOnly="True"
                   AlternatingRowBackground="LightGray"
@@ -33,7 +31,6 @@
 
         </DataGrid>
 
-        <!-- Панель с кнопками -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
 
             <Button x:Name="AddAuthorButton" Content="Добавить автора" Width="130" 

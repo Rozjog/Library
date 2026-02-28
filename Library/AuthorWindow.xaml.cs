@@ -11,7 +11,6 @@ namespace Library
         private Author _currentAuthor;
         private bool _isEditMode;
 
-        // Конструктор для ДОБАВЛЕНИЯ
         internal AuthorWindow(LibraryContext context)
         {
             InitializeComponent();
@@ -24,7 +23,6 @@ namespace Library
             BirthDatePicker.SelectedDate = DateTime.Today;
         }
 
-        // Конструктор для РЕДАКТИРОВАНИЯ
         internal AuthorWindow(LibraryContext context, Author authorToEdit)
         {
             InitializeComponent();
@@ -35,22 +33,16 @@ namespace Library
 
             this.Title = "Редактирование автора";
 
-            // Заполняем поля
             FirstNameTextBox.Text = _currentAuthor.FirstName;
             LastNameTextBox.Text = _currentAuthor.LastName;
             BirthDatePicker.SelectedDate = _currentAuthor.BirthDate;
             CountryTextBox.Text = _currentAuthor.Country;
         }
 
-        // Сохранение
-        // Сохранение
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // === ВАЛИДАЦИЯ ===
-
-                // Проверка имени
                 if (string.IsNullOrWhiteSpace(FirstNameTextBox.Text))
                 {
                     MessageBox.Show("Введите имя автора", "Ошибка",
@@ -59,7 +51,6 @@ namespace Library
                     return;
                 }
 
-                // Проверка фамилии
                 if (string.IsNullOrWhiteSpace(LastNameTextBox.Text))
                 {
                     MessageBox.Show("Введите фамилию автора", "Ошибка",
@@ -68,7 +59,6 @@ namespace Library
                     return;
                 }
 
-                // Проверка даты рождения
                 if (BirthDatePicker.SelectedDate == null)
                 {
                     MessageBox.Show("Выберите дату рождения", "Ошибка",
@@ -77,7 +67,6 @@ namespace Library
                     return;
                 }
 
-                // Проверка, что дата не в будущем
                 if (BirthDatePicker.SelectedDate > DateTime.Today)
                 {
                     MessageBox.Show("Дата рождения не может быть в будущем", "Ошибка",
@@ -86,7 +75,6 @@ namespace Library
                     return;
                 }
 
-                // Проверка, что автору не больше 120 лет
                 if (BirthDatePicker.SelectedDate < DateTime.Today.AddYears(-120))
                 {
                     MessageBox.Show("Возраст автора не может быть больше 120 лет", "Ошибка",
@@ -95,21 +83,17 @@ namespace Library
                     return;
                 }
 
-                // === ВСЕ ПРОВЕРКИ ПРОЙДЕНЫ ===
 
-                // Заполняем автора
                 _currentAuthor.FirstName = FirstNameTextBox.Text.Trim();
                 _currentAuthor.LastName = LastNameTextBox.Text.Trim();
                 _currentAuthor.BirthDate = BirthDatePicker.SelectedDate.Value;
                 _currentAuthor.Country = CountryTextBox.Text?.Trim() ?? "";
 
-                // Добавляем если новый
                 if (!_isEditMode)
                 {
                     _context.Authors.Add(_currentAuthor);
                 }
 
-                // Сохраняем
                 _context.SaveChanges();
 
                 this.DialogResult = true;
@@ -122,7 +106,6 @@ namespace Library
             }
         }
 
-        // Отмена
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             this.DialogResult = false;

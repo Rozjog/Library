@@ -22,45 +22,38 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Строка 1: Название -->
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Название:" 
                    VerticalAlignment="Center" Margin="0,0,10,10"/>
         <TextBox x:Name="TitleTextBox" Grid.Row="0" Grid.Column="1" 
                  Height="30" Margin="0,0,0,10"/>
 
-        <!-- Строка 2: Автор -->
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Автор:" 
                    VerticalAlignment="Center" Margin="0,0,10,10"/>
         <ComboBox x:Name="AuthorComboBox" Grid.Row="1" Grid.Column="1" 
                   Height="30" Margin="0,0,0,10"
                   DisplayMemberPath="LastName"/>
 
-        <!-- Строка 3: Жанр -->
         <TextBlock Grid.Row="2" Grid.Column="0" Text="Жанр:" 
                    VerticalAlignment="Center" Margin="0,0,10,10"/>
         <ComboBox x:Name="GenreComboBox" Grid.Row="2" Grid.Column="1" 
                   Height="30" Margin="0,0,0,10"
                   DisplayMemberPath="Name"/>
 
-        <!-- Строка 4: Год издания -->
         <TextBlock Grid.Row="3" Grid.Column="0" Text="Год издания:" 
                    VerticalAlignment="Center" Margin="0,0,10,10"/>
         <TextBox x:Name="YearTextBox" Grid.Row="3" Grid.Column="1" 
                  Height="30" Margin="0,0,0,10"/>
 
-        <!-- Строка 5: ISBN -->
         <TextBlock Grid.Row="4" Grid.Column="0" Text="ISBN:" 
                    VerticalAlignment="Center" Margin="0,0,10,10"/>
         <TextBox x:Name="IsbnTextBox" Grid.Row="4" Grid.Column="1" 
                  Height="30" Margin="0,0,0,10"/>
 
-        <!-- Строка 6: Количество -->
         <TextBlock Grid.Row="5" Grid.Column="0" Text="Количество:" 
                    VerticalAlignment="Center" Margin="0,0,10,10"/>
         <TextBox x:Name="QuantityTextBox" Grid.Row="5" Grid.Column="1" 
                  Height="30" Margin="0,0,0,10"/>
 
-        <!-- Строка 7: Кнопки -->
         <StackPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" 
                     Orientation="Horizontal" HorizontalAlignment="Right" 
                     VerticalAlignment="Bottom">

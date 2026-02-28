@@ -16,21 +16,18 @@ namespace Library
             InitializeComponent();
 
             _context = context;
-
-            // Загружаем жанры вместе с их книгами (чтобы показать количество)
             LoadGenres();
         }
 
         private void LoadGenres()
         {
             var genres = _context.Genres
-                .Include(g => g.Books)  // загружаем книги, чтобы посчитать количество
+                .Include(g => g.Books)
                 .ToList();
 
             GenresDataGrid.ItemsSource = genres;
         }
 
-        // Добавить жанр
         private void AddGenreButton_Click(object sender, RoutedEventArgs e)
         {
             var genreWindow = new GenreWindow(_context);
@@ -41,8 +38,6 @@ namespace Library
                 LoadGenres();
             }
         }
-
-        // Редактировать жанр
         private void EditGenreButton_Click(object sender, RoutedEventArgs e)
         {
             if (GenresDataGrid.SelectedItem is Genre selectedGenre)
@@ -61,12 +56,10 @@ namespace Library
             }
         }
 
-        // Удалить жанр
         private void DeleteGenreButton_Click(object sender, RoutedEventArgs e)
         {
             if (GenresDataGrid.SelectedItem is Genre selectedGenre)
             {
-                // Проверяем, есть ли у жанра книги
                 if (selectedGenre.Books != null && selectedGenre.Books.Any())
                 {
                     MessageBox.Show("Нельзя удалить жанр, в котором есть книги. Сначала удалите все книги этого жанра.");
@@ -96,8 +89,6 @@ namespace Library
                 MessageBox.Show("Выберите жанр для удаления");
             }
         }
-
-        // Закрыть окно
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
