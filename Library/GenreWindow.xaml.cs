@@ -45,16 +45,23 @@ namespace Library
                     return;
                 }
 
-                if (NameTextBox.Text.Length > 50)
+                if (!_isEditMode)
                 {
-                    MessageBox.Show("Название жанра не должно превышать 50 символов", "Ошибка",
-                        MessageBoxButton.OK, MessageBoxImage.Warning);
-                    NameTextBox.Focus();
-                    return;
+                    bool genreExists = _context.Genres.Any(g =>
+                        g.Name.ToLower() == NameTextBox.Text.Trim().ToLower());
+
+                    if (genreExists)
+                    {
+                        MessageBox.Show($"Жанр с названием '{NameTextBox.Text.Trim()}' уже существует",
+                                       "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        NameTextBox.Focus();
+                        return;
+                    }
                 }
 
                 _currentGenre.Name = NameTextBox.Text.Trim();
                 _currentGenre.Description = DescriptionTextBox.Text?.Trim() ?? "";
+
                 if (!_isEditMode)
                 {
                     _context.Genres.Add(_currentGenre);

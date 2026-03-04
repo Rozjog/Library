@@ -23,7 +23,8 @@ namespace Library
         private void LoadAuthors()
         {
             var authors = _context.Authors
-                .Include(a => a.Books) 
+                .Include(a => a.BookAuthors)
+                .ThenInclude(ba => ba.Book)
                 .ToList();
 
             AuthorsDataGrid.ItemsSource = authors;
@@ -62,7 +63,8 @@ namespace Library
         {
             if (AuthorsDataGrid.SelectedItem is Author selectedAuthor)
             {
-                if (selectedAuthor.Books != null && selectedAuthor.Books.Any())
+                // Проверяем, есть ли у автора книги (через BookAuthors)
+                if (selectedAuthor.BookAuthors != null && selectedAuthor.BookAuthors.Any())
                 {
                     MessageBox.Show("Нельзя удалить автора, у которого есть книги. Сначала удалите все его книги.");
                     return;
@@ -78,7 +80,7 @@ namespace Library
                     {
                         _context.Authors.Remove(selectedAuthor);
                         _context.SaveChanges();
-                        LoadAuthors(); 
+                        LoadAuthors();
                     }
                     catch (Exception ex)
                     {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Library.entity
 {
@@ -11,6 +7,6 @@ namespace Library.entity
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public ICollection<Book> Books { get; set; }
+        public ICollection<BookGenre> BookGenres { get; set; } = new List<BookGenre>();
     }
 }

@@ -20,31 +20,26 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Имя -->
         <TextBlock Grid.Row="0" Grid.Column="0" Text="Имя:" 
                    VerticalAlignment="Center" Margin="0,0,10,15"/>
         <TextBox x:Name="FirstNameTextBox" Grid.Row="0" Grid.Column="1" 
                  Height="30" Margin="0,0,0,15"/>
 
-        <!-- Фамилия -->
         <TextBlock Grid.Row="1" Grid.Column="0" Text="Фамилия:" 
                    VerticalAlignment="Center" Margin="0,0,10,15"/>
         <TextBox x:Name="LastNameTextBox" Grid.Row="1" Grid.Column="1" 
                  Height="30" Margin="0,0,0,15"/>
 
-        <!-- Дата рождения -->
         <TextBlock Grid.Row="2" Grid.Column="0" Text="Дата рождения:" 
                    VerticalAlignment="Center" Margin="0,0,10,15"/>
         <DatePicker x:Name="BirthDatePicker" Grid.Row="2" Grid.Column="1" 
                     Height="30" Margin="0,0,0,15"/>
 
-        <!-- Страна -->
         <TextBlock Grid.Row="3" Grid.Column="0" Text="Страна:" 
                    VerticalAlignment="Center" Margin="0,0,10,15"/>
         <TextBox x:Name="CountryTextBox" Grid.Row="3" Grid.Column="1" 
                  Height="30" Margin="0,0,0,15"/>
 
-        <!-- Кнопки -->
         <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" 
                     Orientation="Horizontal" HorizontalAlignment="Right" 
                     VerticalAlignment="Bottom">

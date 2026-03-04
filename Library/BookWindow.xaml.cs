@@ -1,9 +1,9 @@
-﻿using Library.Data;
-using Library.entity;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Windows;
+using Microsoft.EntityFrameworkCore;
+using Library.Data;
+using Library.entity;
 
 namespace Library
 {
@@ -12,6 +12,7 @@ namespace Library
         private LibraryContext _context;
         private Book _currentBook;
         private bool _isEditMode;
+
         internal BookWindow(LibraryContext context)
         {
             InitializeComponent();
@@ -21,7 +22,6 @@ namespace Library
             _isEditMode = false;
 
             this.Title = "Добавление книги";
-
             LoadComboBoxes();
         }
 
@@ -36,33 +36,69 @@ namespace Library
             this.Title = "Редактирование книги";
 
             LoadComboBoxes();
-
             LoadBookData();
         }
 
         private void LoadComboBoxes()
         {
-            var authors = _context.Authors.ToList();
-            AuthorComboBox.ItemsSource = authors;
+            try
+            {
+                var authors = _context.Authors.ToList();
+                AuthorsListBox.ItemsSource = authors;
+                AuthorsListBox.DisplayMemberPath = "LastName";
 
-            var genres = _context.Genres.ToList();
-            GenreComboBox.ItemsSource = genres;
+                var genres = _context.Genres.ToList();
+                GenresListBox.ItemsSource = genres;
+                GenresListBox.DisplayMemberPath = "Name";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки данных: {ex.Message}", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void LoadBookData()
         {
-            TitleTextBox.Text = _currentBook.Title;
-            YearTextBox.Text = _currentBook.PublishYear.ToString();
-            IsbnTextBox.Text = _currentBook.ISBN;
-            QuantityTextBox.Text = _currentBook.QuantityInStock.ToString();
+            try
+            {
+                TitleTextBox.Text = _currentBook.Title;
+                YearTextBox.Text = _currentBook.PublishYear.ToString();
+                IsbnTextBox.Text = _currentBook.ISBN;
+                QuantityTextBox.Text = _currentBook.QuantityInStock.ToString();
 
-            if (_currentBook.AuthorId > 0)
-            {
-                AuthorComboBox.SelectedValue = _currentBook.AuthorId;
+                if (_isEditMode && _currentBook.Id > 0)
+                {
+
+                    _context.Entry(_currentBook).Collection(b => b.BookAuthors).Load();
+                    var selectedAuthorIds = _currentBook.BookAuthors.Select(ba => ba.AuthorId).ToList();
+
+                    foreach (var item in AuthorsListBox.Items)
+                    {
+                        var author = item as Author;
+                        if (author != null && selectedAuthorIds.Contains(author.Id))
+                        {
+                            AuthorsListBox.SelectedItems.Add(item);
+                        }
+                    }
+
+                    _context.Entry(_currentBook).Collection(b => b.BookGenres).Load();
+                    var selectedGenreIds = _currentBook.BookGenres.Select(bg => bg.GenreId).ToList();
+
+                    foreach (var item in GenresListBox.Items)
+                    {
+                        var genre = item as Genre;
+                        if (genre != null && selectedGenreIds.Contains(genre.Id))
+                        {
+                            GenresListBox.SelectedItems.Add(item);
+                        }
+                    }
+                }
             }
-            if (_currentBook.GenreId > 0)
+            catch (Exception ex)
             {
-                GenreComboBox.SelectedValue = _currentBook.GenreId;
+                MessageBox.Show($"Ошибка загрузки данных книги: {ex.Message}", "Ошибка",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -78,19 +114,19 @@ namespace Library
                     return;
                 }
 
-                if (AuthorComboBox.SelectedItem == null)
+                if (AuthorsListBox.SelectedItems.Count == 0)
                 {
-                    MessageBox.Show("Выберите автора", "Ошибка",
+                    MessageBox.Show("Выберите хотя бы одного автора", "Ошибка",
                         MessageBoxButton.OK, MessageBoxImage.Warning);
-                    AuthorComboBox.Focus();
+                    AuthorsListBox.Focus();
                     return;
                 }
 
-                if (GenreComboBox.SelectedItem == null)
+                if (GenresListBox.SelectedItems.Count == 0)
                 {
-                    MessageBox.Show("Выберите жанр", "Ошибка",
+                    MessageBox.Show("Выберите хотя бы один жанр", "Ошибка",
                         MessageBoxButton.OK, MessageBoxImage.Warning);
-                    GenreComboBox.Focus();
+                    GenresListBox.Focus();
                     return;
                 }
 
@@ -120,7 +156,20 @@ namespace Library
                     return;
                 }
 
-                int quantity = 0;
+                if (!string.IsNullOrWhiteSpace(IsbnTextBox.Text))
+                {
+                    string isbnClean = IsbnTextBox.Text.Replace("-", "").Replace(" ", "");
+
+                    if (!isbnClean.All(char.IsDigit))
+                    {
+                        MessageBox.Show("ISBN может содержать только цифры, дефисы и пробелы",
+                                       "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        IsbnTextBox.Focus();
+                        return;
+                    }
+                }
+
+                    int quantity = 0;
                 if (!string.IsNullOrWhiteSpace(QuantityTextBox.Text))
                 {
                     if (!int.TryParse(QuantityTextBox.Text, out quantity))
@@ -147,15 +196,57 @@ namespace Library
                 _currentBook.ISBN = IsbnTextBox.Text?.Trim() ?? "";
                 _currentBook.QuantityInStock = quantity;
 
-                var selectedAuthor = AuthorComboBox.SelectedItem as Author;
-                var selectedGenre = GenreComboBox.SelectedItem as Genre;
-
-                _currentBook.AuthorId = selectedAuthor.Id;
-                _currentBook.GenreId = selectedGenre.Id;
+                var selectedAuthors = AuthorsListBox.SelectedItems.Cast<Author>().ToList();
+                var selectedGenres = GenresListBox.SelectedItems.Cast<Genre>().ToList();
 
                 if (!_isEditMode)
                 {
                     _context.Books.Add(_currentBook);
+                    _context.SaveChanges();
+
+                    foreach (var author in selectedAuthors)
+                    {
+                        _context.BookAuthors.Add(new BookAuthor
+                        {
+                            BookId = _currentBook.Id,
+                            AuthorId = author.Id
+                        });
+                    }
+
+                    foreach (var genre in selectedGenres)
+                    {
+                        _context.BookGenres.Add(new BookGenre
+                        {
+                            BookId = _currentBook.Id,
+                            GenreId = genre.Id
+                        });
+                    }
+                }
+                else
+                {
+                    var oldAuthors = _context.BookAuthors.Where(ba => ba.BookId == _currentBook.Id);
+                    _context.BookAuthors.RemoveRange(oldAuthors);
+
+                    foreach (var author in selectedAuthors)
+                    {
+                        _context.BookAuthors.Add(new BookAuthor
+                        {
+                            BookId = _currentBook.Id,
+                            AuthorId = author.Id
+                        });
+                    }
+
+                    var oldGenres = _context.BookGenres.Where(bg => bg.BookId == _currentBook.Id);
+                    _context.BookGenres.RemoveRange(oldGenres);
+
+                    foreach (var genre in selectedGenres)
+                    {
+                        _context.BookGenres.Add(new BookGenre
+                        {
+                            BookId = _currentBook.Id,
+                            GenreId = genre.Id
+                        });
+                    }
                 }
 
                 _context.SaveChanges();

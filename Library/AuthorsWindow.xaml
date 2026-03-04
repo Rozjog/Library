@@ -26,7 +26,7 @@
                 <DataGridTextColumn Header="Фамилия" Binding="{Binding LastName}" Width="120"/>
                 <DataGridTextColumn Header="Дата рождения" Binding="{Binding BirthDate, StringFormat={}{0:dd.MM.yyyy}}" Width="120"/>
                 <DataGridTextColumn Header="Страна" Binding="{Binding Country}" Width="120"/>
-                <DataGridTextColumn Header="Книг" Binding="{Binding Books.Count}" Width="80"/>
+                <DataGridTextColumn Header="Книг" Binding="{Binding BookAuthors.Count}" Width="80"/>
             </DataGrid.Columns>
 
         </DataGrid>

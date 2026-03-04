@@ -83,6 +83,20 @@ namespace Library
                     return;
                 }
 
+                if (!_isEditMode)
+                {
+                    bool authorExists = _context.Authors.Any(a =>
+                        a.FirstName.ToLower() == FirstNameTextBox.Text.Trim().ToLower() &&
+                        a.LastName.ToLower() == LastNameTextBox.Text.Trim().ToLower() &&
+                        a.BirthDate.Date == BirthDatePicker.SelectedDate.Value.Date);
+
+                    if (authorExists)
+                    {
+                        MessageBox.Show($"Автор {FirstNameTextBox.Text.Trim()} {LastNameTextBox.Text.Trim()} с такой датой рождения уже существует",
+                                       "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+                }
 
                 _currentAuthor.FirstName = FirstNameTextBox.Text.Trim();
                 _currentAuthor.LastName = LastNameTextBox.Text.Trim();

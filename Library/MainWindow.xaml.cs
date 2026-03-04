@@ -25,8 +25,10 @@ namespace Library
         private void LoadData()
         {
             var books = _context.Books
-                .Include(b => b.Author)
-                .Include(b => b.Genre)
+                .Include(b => b.BookAuthors)       
+                .ThenInclude(ba => ba.Author)    
+                .Include(b => b.BookGenres)    
+                .ThenInclude(bg => bg.Genre)        
                 .ToList();
 
             BooksDataGrid.ItemsSource = books;
@@ -138,8 +140,10 @@ namespace Library
         private void ApplyFilters()
         {
             var query = _context.Books
-                .Include(b => b.Author)
-                .Include(b => b.Genre)
+                .Include(b => b.BookAuthors)
+                .ThenInclude(ba => ba.Author)
+                .Include(b => b.BookGenres)
+                .ThenInclude(bg => bg.Genre)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(SearchTextBox.Text))
@@ -150,11 +154,12 @@ namespace Library
 
             if (AuthorFilterComboBox.SelectedItem is Author selectedAuthor && selectedAuthor.Id > 0)
             {
-                query = query.Where(b => b.AuthorId == selectedAuthor.Id);
+                query = query.Where(b => b.BookAuthors.Any(ba => ba.AuthorId == selectedAuthor.Id));
             }
+
             if (GenreFilterComboBox.SelectedItem is Genre selectedGenre && selectedGenre.Id > 0)
             {
-                query = query.Where(b => b.GenreId == selectedGenre.Id);
+                query = query.Where(b => b.BookGenres.Any(bg => bg.GenreId == selectedGenre.Id));
             }
 
             var filteredBooks = query.ToList();

@@ -22,7 +22,8 @@ namespace Library
         private void LoadGenres()
         {
             var genres = _context.Genres
-                .Include(g => g.Books)
+                .Include(g => g.BookGenres)
+                .ThenInclude(bg => bg.Book)
                 .ToList();
 
             GenresDataGrid.ItemsSource = genres;
@@ -60,7 +61,7 @@ namespace Library
         {
             if (GenresDataGrid.SelectedItem is Genre selectedGenre)
             {
-                if (selectedGenre.Books != null && selectedGenre.Books.Any())
+                if (selectedGenre.BookGenres != null && selectedGenre.BookGenres.Any())
                 {
                     MessageBox.Show("Нельзя удалить жанр, в котором есть книги. Сначала удалите все книги этого жанра.");
                     return;

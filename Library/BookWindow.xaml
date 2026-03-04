@@ -1,7 +1,7 @@
 ﻿<Window x:Class="Library.BookWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Добавление книги" Height="400" Width="500"
+        Title="Добавление книги" Height="500" Width="500"
         WindowStartupLocation="CenterOwner"
         WindowStyle="SingleBorderWindow"
         ResizeMode="NoResize">
@@ -27,18 +27,20 @@
         <TextBox x:Name="TitleTextBox" Grid.Row="0" Grid.Column="1" 
                  Height="30" Margin="0,0,0,10"/>
 
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Автор:" 
-                   VerticalAlignment="Center" Margin="0,0,10,10"/>
-        <ComboBox x:Name="AuthorComboBox" Grid.Row="1" Grid.Column="1" 
-                  Height="30" Margin="0,0,0,10"
-                  DisplayMemberPath="LastName"/>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Авторы:" 
+           VerticalAlignment="Top" Margin="0,0,10,10"/>
+        <ListBox x:Name="AuthorsListBox" Grid.Row="1" Grid.Column="1" 
+         Height="100" Margin="0,0,0,10"
+         SelectionMode="Multiple"
+         DisplayMemberPath="LastName"/>
 
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Жанр:" 
-                   VerticalAlignment="Center" Margin="0,0,10,10"/>
-        <ComboBox x:Name="GenreComboBox" Grid.Row="2" Grid.Column="1" 
-                  Height="30" Margin="0,0,0,10"
-                  DisplayMemberPath="Name"/>
-
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Жанры:" 
+           VerticalAlignment="Top" Margin="0,0,10,10"/>
+        <ListBox x:Name="GenresListBox" Grid.Row="2" Grid.Column="1" 
+         Height="100" Margin="0,0,0,10"
+         SelectionMode="Multiple"
+         DisplayMemberPath="Name"/>
+        
         <TextBlock Grid.Row="3" Grid.Column="0" Text="Год издания:" 
                    VerticalAlignment="Center" Margin="0,0,10,10"/>
         <TextBox x:Name="YearTextBox" Grid.Row="3" Grid.Column="1" 
